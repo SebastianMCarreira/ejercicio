@@ -41,13 +41,6 @@ jobs:
     - name: Push Docker image to remote
       run: |
         docker push $DOCKER_HUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
-    
-    - name: Configure AWS Credentials for github actions
-      uses: aws-actions/configure-aws-credentials@v4.0.2
-      with:
-        audience: sts.amazonaws.com
-        aws-region: ${{secrets.AWS_REGION}}
-        role-to-assume: ${{secrets.ROLE_TO_ASSUME}}
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v3
