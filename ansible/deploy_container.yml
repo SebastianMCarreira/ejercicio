@@ -1,0 +1,33 @@
+---
+- name: Pull new latest and run
+  hosts: ec2_instances
+  become: true
+
+  tasks:
+    - name: Stop all containers
+      shell: |
+        docker ps -q | xargs -r docker stop
+      ignore_errors: yes
+
+    - name: Remove all containers
+      shell: |
+        docker ps -a -q | xargs -r docker rm
+      ignore_errors: yes
+
+    - name: Remove all Docker images
+      shell: |
+        docker images -q | xargs -r docker rmi -f
+      ignore_errors: yes
+
+    - name: Pull image
+      docker_image:
+        name: scarreiraaws/ejercicio
+        source: pull
+
+    - name: Run container
+      docker_container:
+        name: ejercicio
+        image: scarreiraaws/ejercicio
+        state: started
+        ports:
+          - "80:80"
