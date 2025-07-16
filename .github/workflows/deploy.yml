@@ -13,6 +13,9 @@ jobs:
       IMAGE_NAME: ejercicio
       IMAGE_TAG: latest
       DOCKER_HUB_USERNAME: scarreiraaws
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
     steps:
     - name: Checkout repository
@@ -38,6 +41,13 @@ jobs:
     - name: Push Docker image to remote
       run: |
         docker push $DOCKER_HUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+    
+    - name: Configure AWS Credentials for github actions
+      uses: aws-actions/configure-aws-credentials@v4.0.2
+      with:
+        audience: sts.amazonaws.com
+        aws-region: ${{secrets.AWS_REGION}}
+        role-to-assume: ${{secrets.ROLE_TO_ASSUME}}
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v3
