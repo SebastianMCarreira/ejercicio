@@ -7,7 +7,6 @@ on:
 
 jobs:
   build-push-deploy:
-    environment: deploy
     runs-on: ubuntu-latest
 
     env:
@@ -34,11 +33,11 @@ jobs:
 
     - name: Tag Docker image for remote
       run: |
-        docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKER_HUB_USERNAME:$IMAGE_TAG
+        docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKER_HUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
 
     - name: Push Docker image to remote
       run: |
-        docker push $DOCKER_HUB_USERNAME:$IMAGE_TAG
+        docker push $DOCKER_HUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v3
@@ -50,3 +49,17 @@ jobs:
     - name: Terraform Apply
       working-directory: infra
       run: terraform apply -auto-approve
+
+    - name: Write SSH key to file
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy.pem
+        chmod 600 ~/.ssh/deploy.pem
+    
+    - name: Update inventory
+      run: |
+        aws ec2 describe-instances --filters "Name=tag:Name,Values=ejercicio-ec2" --query "Reservations[].Instances[].PublicIpAddress" --output text | xargs -I {} sed "s/PUBLIC_IP/{}/g" ansible/inventory.ini.template > ansible/inventory.ini
+
+    - name: Run Ansible Playbook
+      run: |
+        ansible-playbook -i ansible/inventory.ini ansible/deploy_container.yml
