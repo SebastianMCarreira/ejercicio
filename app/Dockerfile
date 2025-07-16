@@ -22,7 +22,7 @@ RUN wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod
     dpkg -i packages-microsoft-prod.deb && \
     rm packages-microsoft-prod.deb && \
     apt-get update && \
-    apt-get install -y --no-install-recommends dotnet-sdk-8.0
+    apt-get install -y --no-install-recommends dotnet-sdk-9.0
 
 # VSCode
 RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg && \

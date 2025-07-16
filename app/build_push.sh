@@ -1,0 +1,5 @@
+IMAGE_NAME=ejercicio
+DOCKERHUB_USERNAME=scarreiraaws
+docker build -t $IMAGE_NAME .
+docker tag $IMAGE_NAME $DOCKERHUB_USERNAME/$IMAGE_NAME
+docker push $DOCKERHUB_USERNAME/$IMAGE_NAME
